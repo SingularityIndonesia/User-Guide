@@ -44,8 +44,8 @@ class UserGuideState {
         stiffness = Spring.StiffnessMediumLow
     )
 
-    internal fun registerTarget(id: String, order: Int, position: Offset, size: Size) {
-        val targetInfo = TargetInfo(id, order, position, size)
+    internal fun registerTarget(id: String, order: Int, position: Offset, size: Size, tooltipContent: String? = null) {
+        val targetInfo = TargetInfo(id, order, position, size, tooltipContent)
         _targets[id] = targetInfo
         updateOrderedTargets()
     }
@@ -54,6 +54,12 @@ class UserGuideState {
         _targets[id]?.let { target ->
             target.position = position
             target.size = size
+        }
+    }
+    
+    internal fun updateTargetTooltip(id: String, tooltipContent: String?) {
+        _targets[id]?.let { target ->
+            target.tooltipContent = tooltipContent
         }
     }
 
@@ -130,15 +136,26 @@ class UserGuideState {
 
     fun nextGuide() {
         if (_currentStep < orderedTargets.size - 1) {
+            // First set the animation state to ENTERING for the transition
+            _animationState = GuideAnimationState.ENTERING
+            // Then increment the step
             _currentStep++
-            _animationState = GuideAnimationState.NAVIGATING
+            // The animation will handle the transition and then set state to NAVIGATING
         } else {
             _animationState = GuideAnimationState.EXITING
         }
     }
 
     fun skipGuide() {
-        nextGuide()
+        if (_currentStep < orderedTargets.size - 1) {
+            // First set the animation state to ENTERING for the transition
+            _animationState = GuideAnimationState.ENTERING
+            // Then increment the step
+            _currentStep++
+            // The animation will handle the transition and then set state to NAVIGATING
+        } else {
+            _animationState = GuideAnimationState.EXITING
+        }
     }
 
     fun skipAllGuide() {

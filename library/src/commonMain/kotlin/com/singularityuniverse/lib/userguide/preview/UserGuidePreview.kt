@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.singularityuniverse.lib.userguide.ClipMode
+import com.singularityuniverse.lib.userguide.UserGuideOverlay
 import com.singularityuniverse.lib.userguide.addTargetToTargetGuide
 import com.singularityuniverse.lib.userguide.rememberUserGuideState
 import com.singularityuniverse.lib.userguide.userGuide
@@ -42,6 +43,9 @@ fun UserGuideFitBoundsPreview() {
 @Composable
 private fun UserGuidePreviewContent(userGuideState: com.singularityuniverse.lib.userguide.UserGuideState, title: String) {
     Box(modifier = Modifier.fillMaxSize()) {
+        // This overlay displays the tooltips/balloons
+        UserGuideOverlay(state = userGuideState)
+        
         Column(
             modifier = Modifier.align(Alignment.BottomStart)
                 .zIndex(1f)
@@ -87,7 +91,12 @@ private fun UserGuidePreviewContent(userGuideState: com.singularityuniverse.lib.
                 Text(
                     modifier = Modifier
                         .padding(8.dp)
-                        .addTargetToTargetGuide(userGuideState, id = "target-1", order = 0),
+                        .addTargetToTargetGuide(
+                            userGuideState, 
+                            id = "target-1", 
+                            order = 0,
+                            tooltipContent = "This is the first target in our guide. The tooltip appears above or below based on available space."
+                        ),
                     text = "This is Target 1"
                 )
 
@@ -96,7 +105,12 @@ private fun UserGuidePreviewContent(userGuideState: com.singularityuniverse.lib.
                 Text(
                     modifier = Modifier
                         .padding(8.dp)
-                        .addTargetToTargetGuide(userGuideState, id = "target-2", order = 2),
+                        .addTargetToTargetGuide(
+                            userGuideState, 
+                            id = "target-2", 
+                            order = 2,
+                            tooltipContent = "This is the third target. Notice how the tooltip automatically positions itself."
+                        ),
                     text = "This is Target 3"
                 )
 
@@ -105,7 +119,12 @@ private fun UserGuidePreviewContent(userGuideState: com.singularityuniverse.lib.
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .addTargetToTargetGuide(userGuideState, id = "target-3", order = 1)
+                        .addTargetToTargetGuide(
+                            userGuideState, 
+                            id = "target-3", 
+                            order = 1,
+                            tooltipContent = "This is the second target in our guide sequence. You can add detailed instructions here."
+                        )
                         .size(120.dp)
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
