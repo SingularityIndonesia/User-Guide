@@ -1,4 +1,4 @@
-package com.singularityuniverse.lib.userguide.preview
+package com.singularityuniverse.lib.userguide.example
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -17,7 +17,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
-fun UserGuideFitBoundsPreview() {
+fun UserGuideFitBoundsExample() {
     val userGuideState = rememberUserGuideState(clipMode = ClipMode.FitBounds)
 
     Box(modifier = Modifier.fillMaxSize()) {
