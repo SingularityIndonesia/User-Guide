@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "UserGuide"
 include(":library")
+include(":example")
