@@ -110,7 +110,9 @@ private fun Content(userGuideState: UserGuideState) {
                                 isTargetHorizontallyCentered -> 0.dp
                                 isPreferRight -> targetRightSpace
                                 else -> 0.dp
-                            }
+                            },
+                            top = 8.dp,
+                            bottom = 8.dp
                         )
                         .border(borderStroke1Dp(if (isDebugMode) Color.Blue else Color.Transparent)),
                 ) {
@@ -131,7 +133,9 @@ private fun Content(userGuideState: UserGuideState) {
                                 isTargetHorizontallyCentered -> 0.dp
                                 isPreferRight -> targetRightSpace
                                 else -> 0.dp
-                            }
+                            },
+                            top = 8.dp,
+                            bottom = 8.dp
                         )
                         .border(borderStroke1Dp(if (isDebugMode) Color.Blue else Color.Transparent)),
                 ) {
