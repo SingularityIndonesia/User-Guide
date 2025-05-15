@@ -44,23 +44,22 @@ class UserGuideState {
         stiffness = Spring.StiffnessMediumLow
     )
 
-    internal fun registerTarget(id: String, order: Int, position: Offset, size: Size, tooltipContent: String? = null) {
-        val targetInfo = TargetInfo(id, order, position, size, tooltipContent)
+    internal fun registerTarget(
+        id: String,
+        order: Int,
+        position: Offset,
+        size: Size,
+        tooltipContent: String,
+    ) {
+        val targetInfo = TargetInfo(
+            id = id, 
+            order = order, 
+            position = position, 
+            size = size, 
+            tooltipContent = tooltipContent,
+        )
         _targets[id] = targetInfo
         updateOrderedTargets()
-    }
-
-    internal fun updateTargetPosition(id: String, position: Offset, size: Size) {
-        _targets[id]?.let { target ->
-            target.position = position
-            target.size = size
-        }
-    }
-    
-    internal fun updateTargetTooltip(id: String, tooltipContent: String?) {
-        _targets[id]?.let { target ->
-            target.tooltipContent = tooltipContent
-        }
     }
 
     internal fun setFullScreenRect(rect: Rect) {
@@ -146,12 +145,12 @@ class UserGuideState {
         }
     }
 
-    fun skipGuide() {
-        if (_currentStep < orderedTargets.size - 1) {
+    fun previousGuide() {
+        if (_currentStep > 0) {
             // First set the animation state to ENTERING for the transition
             _animationState = GuideAnimationState.ENTERING
             // Then increment the step
-            _currentStep++
+            _currentStep--
             // The animation will handle the transition and then set state to NAVIGATING
         } else {
             _animationState = GuideAnimationState.EXITING

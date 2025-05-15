@@ -9,8 +9,7 @@ data class TargetInfo(
     val order: Int,
     var position: Offset = Offset.Companion.Zero,
     var size: Size = Size.Companion.Zero,
-    var tooltipContent: String? = null
+    var tooltipContent: String,
 ) {
-    val rect: Rect
-        get() = Rect(position, size)
+    val rect: Rect get() = Rect(position, size)
 }
