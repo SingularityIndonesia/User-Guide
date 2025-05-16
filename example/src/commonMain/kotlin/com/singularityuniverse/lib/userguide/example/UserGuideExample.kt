@@ -12,12 +12,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.singularityuniverse.lib.userguide.*
 import com.singularityuniverse.lib.userguide.tools.LocalIsDebugModeEnabled
-import com.singularityuniverse.lib.userguide.tools.borderStroke1Dp
+import com.singularityuniverse.lib.userguide.example.tools.borderStroke1Dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
-fun UserGuideFitBoundsExample() {
+fun UserGuideExample() {
     val userGuideState = rememberUserGuideState(clipMode = ClipMode.FitBounds)
 
     Box(modifier = Modifier.fillMaxSize()) {

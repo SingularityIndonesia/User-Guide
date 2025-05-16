@@ -1,4 +1,4 @@
-package com.singularityuniverse.lib.userguide.tools
+package com.singularityuniverse.lib.userguide.example.tools
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
