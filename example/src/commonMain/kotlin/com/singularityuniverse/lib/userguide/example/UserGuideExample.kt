@@ -67,7 +67,7 @@ private fun Content(userGuideState: UserGuideState) {
                         userGuideState,
                         id = "target-2",
                         order = 1,
-                        tooltipContent = "This is the third target. Notice how the tooltip automatically positions itself."
+                        tooltipContent = "This is the second target. Notice how the tooltip automatically positions itself."
                     ),
                 text = "This is Target 2"
             )
@@ -81,7 +81,7 @@ private fun Content(userGuideState: UserGuideState) {
                         userGuideState,
                         id = "target-3",
                         order = 2,
-                        tooltipContent = "This is the second target in our guide sequence. You can add detailed instructions here."
+                        tooltipContent = "This is the third target in our guide sequence. You can add detailed instructions here."
                     )
                     .size(120.dp)
                     .padding(8.dp),
