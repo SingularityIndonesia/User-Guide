@@ -95,36 +95,36 @@ android {
     }
 }
 
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    signAllPublications()
-
-    coordinates(group.toString(), "library", version.toString())
-
-    pom {
-        name = "User Guide"
-        description = "Jetpack Compose library to interactively guide the user."
-        inceptionYear = "2024"
-        url = "https://github.com/kotlin/multiplatform-library-template/"
-        licenses {
-            license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
-            }
-        }
-        developers {
-            developer {
-                id = "XXX"
-                name = "YYY"
-                url = "ZZZ"
-            }
-        }
-        scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
-        }
-    }
-}
+//mavenPublishing {
+//    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+//
+//    signAllPublications()
+//
+//    coordinates(group.toString(), "userguide", version.toString())
+//
+//    pom {
+//        name = "User Guide"
+//        description = "Jetpack Compose library to interactively guide the user."
+//        inceptionYear = "2025"
+//        url = "https://github.com/SingularityIndonesia/User-Guide"
+//        licenses {
+//            license {
+//                name = "The Apache License, Version 2.0"
+//                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+//                distribution = "repo"
+//            }
+//        }
+//        developers {
+//            developer {
+//                id = "singularity"
+//                name = "Singularity Indonesia"
+//                url = "https://github.com/SingularityIndonesia"
+//            }
+//        }
+//        scm {
+//            url = "https://github.com/SingularityIndonesia/User-Guide"
+//            connection = "scm:git:https://github.com/SingularityIndonesia/User-Guide.git"
+//            developerConnection = "scm:git:ssh://git@github.com:SingularityIndonesia/User-Guide.git"
+//        }
+//    }
+//}
