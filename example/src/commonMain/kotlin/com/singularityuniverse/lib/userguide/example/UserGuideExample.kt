@@ -1,18 +1,20 @@
 package com.singularityuniverse.lib.userguide.example
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.singularityuniverse.lib.userguide.*
 import com.singularityuniverse.lib.userguide.tools.LocalIsDebugModeEnabled
-import com.singularityuniverse.lib.userguide.example.tools.borderStroke1Dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -32,6 +34,7 @@ fun UserGuideExample() {
 @Preview
 @Composable
 private fun Content(userGuideState: UserGuideState) {
+    val density = LocalDensity.current
     val isDebugMode = true
 
     Scaffold(
@@ -97,50 +100,18 @@ private fun Content(userGuideState: UserGuideState) {
         UserGuideOverlay(
             state = userGuideState
         ) { info ->
-            if (isPreferTop) drawAbove {
+            // Tool Tip
+            drawAuto {
                 Box(
-                    modifier = Modifier
-                        .padding(
-                            start = when {
-                                isTargetHorizontallyCentered -> 0.dp
-                                isPreferLeft -> targetLeftSpace
-                                else -> 0.dp
-                            },
-                            end = when {
-                                isTargetHorizontallyCentered -> 0.dp
-                                isPreferRight -> targetRightSpace
-                                else -> 0.dp
-                            },
-                            top = 8.dp,
-                            bottom = 8.dp
-                        )
-                        .border(borderStroke1Dp(if (isDebugMode) Color.Blue else Color.Transparent)),
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     ToolTip(content = info.tooltipContent)
                 }
             }
 
-            if (isPreferBottom) drawBellow {
-                Box(
-                    modifier = Modifier
-                        .padding(
-                            start = when {
-                                isTargetHorizontallyCentered -> 0.dp
-                                isPreferLeft -> targetLeftSpace
-                                else -> 0.dp
-                            },
-                            end = when {
-                                isTargetHorizontallyCentered -> 0.dp
-                                isPreferRight -> targetRightSpace
-                                else -> 0.dp
-                            },
-                            top = 8.dp,
-                            bottom = 8.dp
-                        )
-                        .border(borderStroke1Dp(if (isDebugMode) Color.Blue else Color.Transparent)),
-                ) {
-                    ToolTip(content = info.tooltipContent)
-                }
+            // Pointer
+            drawPointer {
+                Pointer(rotationDegrees = if (isPreferTop) 180f else 0f)
             }
         }
     }
@@ -190,4 +161,36 @@ fun ToolTip(modifier: Modifier = Modifier, content: String) {
             )
         }
     }
+}
+
+@Composable
+fun Pointer(
+    rotationDegrees: Float = 0f
+) {
+    val color = MaterialTheme.colorScheme.surface
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .drawWithContent {
+                drawContent()
+                val width = size.width
+                val height = size.height
+
+                val triangle = Path().apply {
+                    // Triangle pointing up
+                    moveTo(width / 2f, 0f)              // Top middle
+                    lineTo(0f, height)                  // Bottom left
+                    lineTo(width, height)
+                    // Bottom right
+                    close()
+                }
+
+                rotate(rotationDegrees, pivot = size.center) {
+                    drawPath(
+                        path = triangle,
+                        color = color
+                    )
+                }
+            }
+    )
 }

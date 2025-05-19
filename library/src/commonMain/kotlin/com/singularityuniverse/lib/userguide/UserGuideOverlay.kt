@@ -1,16 +1,23 @@
 package com.singularityuniverse.lib.userguide
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.singularityuniverse.lib.userguide.tools.LocalIsDebugModeEnabled
@@ -29,11 +36,14 @@ fun UserGuideOverlay(
         .apply { tooltipBuilder(this, currentTarget ?: return) }
 
     if (state.isShowing && state.animationState == GuideAnimationState.NAVIGATING) {
-        Column {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // top section container
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height((scope.targetRect.top / density.density).dp)
+                    .height((scope.highlightRect.top / density.density).dp)
                     .border(borderStroke1Dp(if (isDebugMode) Color.Red else Color.Transparent)),
                 contentAlignment = when {
                     scope.isTargetHorizontallyCentered -> Alignment.BottomCenter
@@ -41,12 +51,13 @@ fun UserGuideOverlay(
                     else -> Alignment.BottomStart
                 }
             ) {
-                scope.aboveContent?.invoke(this)
+                scope.aboveContents.map { it.invoke(this) }
             }
 
+            // top section container
             Box(
                 modifier = Modifier
-                    .padding(top = (scope.targetRect.height / density.density).dp)
+                    .padding(top = (scope.highlightRect.bottom / density.density).dp)
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .border(borderStroke1Dp(if (isDebugMode) Color.Red else Color.Transparent)),
@@ -58,7 +69,7 @@ fun UserGuideOverlay(
                     }
             ) {
 
-                scope.bellowContent?.invoke(this)
+                scope.bellowContents.map { it.invoke(this) }
 
                 if (isDebugMode)
                     Text(
@@ -73,6 +84,8 @@ fun UserGuideOverlay(
                             .zIndex(1f)
                     )
             }
+
+            scope.topContents.map { it.invoke(this) }
         }
     }
 }
@@ -86,31 +99,103 @@ class UserGuideOverlayScope(
     }
 
     val rootRect: Rect get() = state.fullScreenRect
-    val targetRect: Rect get() = state.animatedRect
+    val highlightRect: Rect get() = state.animatedRect
+    val targetRect: Rect? get() = state.getCurrentTarget()?.rect
 
-    val isPreferTop: Boolean get() = targetRect.center.y > rootRect.center.y
+    val isPreferTop: Boolean get() = highlightRect.center.y > rootRect.center.y
     val isPreferBottom: Boolean get() = !isPreferTop
-    val isPreferLeft: Boolean get() = targetRect.center.x < rootRect.center.x
+    val isPreferLeft: Boolean get() = highlightRect.center.x < rootRect.center.x
     val isPreferRight: Boolean get() = !isPreferLeft
 
     val isTargetHorizontallyCentered: Boolean
-        get() = (targetRect.center.x - rootRect.center.x).absoluteValue < FLOAT_ROUNDING_PIXEL_TOLERANCE
-    val isTargetVerticallyCentered: Boolean = targetRect.center.y == rootRect.center.y
+        get() = (highlightRect.center.x - rootRect.center.x).absoluteValue < FLOAT_ROUNDING_PIXEL_TOLERANCE
+    val isTargetVerticallyCentered: Boolean = highlightRect.center.y == rootRect.center.y
 
-    val targetLeftSpace: Dp = (targetRect.left / density.density).dp
-    val targetRightSpace: Dp = ((rootRect.width - targetRect.right) / density.density).dp
+    val targetLeftSpace: Dp = (highlightRect.left / density.density).dp
+    val targetRightSpace: Dp = ((rootRect.width - highlightRect.right) / density.density).dp
 
-    internal var bellowContent: (@Composable BoxScope.() -> Unit)? = null
+    internal var bellowContents: List<@Composable BoxScope.() -> Unit> = emptyList()
         private set
 
     fun drawBellow(content: @Composable BoxScope.() -> Unit) {
-        bellowContent = content
+        bellowContents += content
     }
 
-    internal var aboveContent: (@Composable BoxScope.() -> Unit)? = null
+    internal var aboveContents: List<@Composable BoxScope.() -> Unit> = emptyList()
         private set
 
     fun drawAbove(content: @Composable BoxScope.() -> Unit) {
-        aboveContent = content
+        aboveContents += content
+    }
+
+    internal var topContents: List<@Composable BoxScope.() -> Unit> = emptyList()
+        private set
+
+    fun drawOnTop(content: @Composable BoxScope.() -> Unit) {
+        topContents += content
+    }
+
+    fun drawPointer(content: @Composable BoxScope.() -> Unit) {
+        topContents += @Composable {
+            val pointerSize = remember { mutableStateOf(IntSize.Zero) }
+            val pointerCenter = pointerSize.value.center
+
+            Box(
+                modifier = Modifier
+                    .onSizeChanged { pointerSize.value = it }
+                    // translate container into proper position automatically
+                    .offset {
+                        val targetCenter = targetRect?.center
+                            ?.let { IntOffset(it.x.toInt(), it.y.toInt()) }
+                            ?: IntOffset.Zero
+
+                        val center = targetCenter - pointerCenter
+
+                        val verticalOffsetCorrection = (if (isPreferTop) -1 else 1) *
+                                (pointerSize.value.height + (targetRect?.height ?: 0f)) / 2
+
+                        center + IntOffset(x = 0, y = verticalOffsetCorrection.toInt())
+                    }
+            ) {
+                content()
+            }
+        }
+    }
+
+    fun drawAuto(content: @Composable BoxScope.() -> Unit) {
+        if (isPreferTop) drawAbove {
+            DrawAutoContainer {
+                content()
+            }
+        }
+
+        if (isPreferBottom) drawBellow {
+            DrawAutoContainer {
+                content()
+            }
+        }
+    }
+
+    @Composable
+    private fun DrawAutoContainer(content: @Composable BoxScope.() -> Unit) {
+        val isDebugMode = LocalIsDebugModeEnabled.current
+        Box(
+            modifier = Modifier
+                .padding(
+                    start = when {
+                        isTargetHorizontallyCentered -> 0.dp
+                        isPreferLeft -> targetLeftSpace
+                        else -> 0.dp
+                    },
+                    end = when {
+                        isTargetHorizontallyCentered -> 0.dp
+                        isPreferRight -> targetRightSpace
+                        else -> 0.dp
+                    },
+                )
+                .border(borderStroke1Dp(if (isDebugMode) Color.Blue else Color.Transparent)),
+        ) {
+            content()
+        }
     }
 }
